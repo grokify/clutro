@@ -1,0 +1,2 @@
+# Fixture files are checksummed; never convert their line endings.
+testdata/** -text

@@ -1,0 +1,61 @@
+site_name: CLUTRO
+site_description: Modern clustering toolkit for Go — repeated bisection, spherical k-means, pluggable criteria, cluster explanation, deterministic results.
+site_url: https://grokify.github.io/clutro/
+repo_url: https://github.com/grokify/clutro
+repo_name: grokify/clutro
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - Installation: guides/installation.md
+      - Quick Start: guides/quickstart.md
+      - Concepts: guides/concepts.md
+      - Algorithms: guides/algorithms.md
+      - Explaining Clusters: guides/explaining.md
+      - Evaluating Clusterings: guides/evaluating.md
+      - Numerics and Determinism: guides/numerics.md
+  - Reference:
+      - CLI Reference: guides/cli-reference.md
+      - CLUTO Compatibility: guides/cluto-compatibility.md
+      - Benchmarks and Validation: guides/benchmarks.md
+  - Specifications:
+      - Product Requirements: specs/PRD.md
+      - Technical Requirements: specs/TRD.md
+      - Plan: specs/PLAN.md
+      - Roadmap: specs/ROADMAP.md
+  - Releases:
+      - v0.1.0: releases/v0.1.0.md

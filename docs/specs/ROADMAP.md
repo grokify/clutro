@@ -39,11 +39,11 @@ Phase status is always derived from member RMI statuses, never set directly. Rev
 ## Phase 4 — Explanation, Internal Metrics & v0.1.0
 **Theme:** Clusters that explain themselves and runs that can be scored without truth labels; the first tagged release with a production consumer.
 
-- [ ] `RMI-CLUTRO-016` explain/: descriptive and discriminating features with cumulative share, representatives, ISim/ESim summaries; column labels option; `-showfeatures`, `-showsummaries`, `describe`
-- [ ] `RMI-CLUTRO-017` evaluate/ internal metrics: silhouette (seeded sampling), Davies–Bouldin, Calinski–Harabasz; scikit-learn cross-check script
-- [ ] `RMI-CLUTRO-018` examples/: sparse text with explanation, dense embeddings, tree cut, CLUTO migration — compiled in CI; README example sourced from examples/sparse
-- [ ] `RMI-CLUTRO-019` Docs: `docs/{algorithms,numerics,compatibility,production,benchmarking}.md` — algorithm reference with citations, numerics and determinism contract, "differences from CLUTO", benchmark page from bench/ runs with recorded environment
-- [ ] `RMI-CLUTRO-020` Release v0.1.0: CHANGELOG, coverage badge, CI-green tag; first consumer switched to the tag
+- [x] `RMI-CLUTRO-016` explain/: descriptive and discriminating features, representatives, ISim/ESim summaries; column labels option; `Result.Describe/Discriminate/Representatives/Summaries` (CLI `-showfeatures`/`describe` deferred to v0.2)
+- [x] `RMI-CLUTRO-017` evaluate/ internal metrics: silhouette (seeded sampling), Davies–Bouldin, Calinski–Harabasz; scikit-learn cross-check script
+- [x] `RMI-CLUTRO-018` examples/: sparse text with explanation, dense embeddings, tree cut, CLUTO migration — compiled in CI; README example mirrors examples/sparse
+- [x] `RMI-CLUTRO-019` Docs: MkDocs site with guides (concepts, algorithms, explaining, evaluating, numerics and determinism, CLI reference, CLUTO compatibility, benchmarks and validation), specs and release notes
+- [ ] `RMI-CLUTRO-020` Release v0.1.0: CHANGELOG, CI-green tag; first consumer switched to the tag
 
 ## Phase 5 — v0.2: Full Criterion Family & Hierarchical
 **Theme:** Complete CLUTO's optimization vocabulary and extend it to agglomerative clustering, keeping the same delta discipline and determinism.

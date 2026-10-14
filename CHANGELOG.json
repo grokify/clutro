@@ -1,0 +1,16 @@
+{
+  "irVersion": "1.0",
+  "project": "clutro",
+  "repository": "https://github.com/grokify/clutro",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["grokify"],
+  "unreleased": {
+    "added": [
+      { "description": "`matrix`: `SparseVec`, the `Rows` interface, `CSR` (from rows or triplets, L2 row normalization, column scaling, document frequencies) and `Dense` with cached row norms, merge-join dot products, and `Composite` cluster vectors with incremental add/remove and what-if norms" },
+      { "description": "`metric`: `Similarity` interface with `Cosine` (normalized fast path) and `Euclidean` (as distance and as similarity, centroid-based against composites)" },
+      { "description": "Deterministic foundations: seeded named RNG sub-streams and a chunked worker pool with worker-order reductions, plus a planted-structure corpus generator for tests and benchmarks" }
+    ]
+  },
+  "releases": []
+}

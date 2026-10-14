@@ -1,0 +1,29 @@
+version: "2"
+linters:
+  enable:
+    - dogsled
+    - dupl
+    - gosec
+    - misspell
+    - nakedret
+    - staticcheck
+    - unconvert
+    - unparam
+    - whitespace
+  settings:
+    gosec:
+      excludes:
+        # G115 (int -> uint32/int32 conversions): column indices and labels
+        # are deliberately 32-bit; constructors check ranges once.
+        - G115
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+formatters:
+  enable:
+    - gofmt
+    - goimports

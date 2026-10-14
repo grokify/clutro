@@ -1,0 +1,1772 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modern clustering toolkit for Go — repeated bisection, spherical k-means, pluggable criteria, cluster explanation, deterministic results.">
+      
+      
+      
+        <link rel="canonical" href="https://grokify.github.io/clutro/specs/TRD/">
+      
+      
+        <link rel="prev" href="../PRD/">
+      
+      
+        <link rel="next" href="../PLAN/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Technical Requirements - CLUTRO</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#clutro-technical-requirements-document-trd" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CLUTRO" class="md-header__button md-logo" aria-label="CLUTRO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CLUTRO
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Technical Requirements
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/grokify/clutro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    grokify/clutro
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CLUTRO" class="md-nav__button md-logo" aria-label="CLUTRO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    CLUTRO
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/grokify/clutro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    grokify/clutro
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/explaining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Explaining Clusters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/evaluating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluating Clusterings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/numerics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerics and Determinism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cli-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cluto-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLUTO Compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks and Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specifications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Requirements
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Architecture overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-module-and-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Module and dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-package-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Package layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-core-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Core types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-algorithms-v01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Algorithms (v0.1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Algorithms (v0.1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-k-means-and-spherical-k-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 k-means and spherical k-means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-repeated-bisection-rb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Repeated bisection (rb)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-refinement-rbr-and-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Refinement (rbr, and direct)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-criterion-i2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Criterion I2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-parallelism-and-determinism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Parallelism and determinism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-explanation-explain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Explanation (explain/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cluto-file-formats-cluto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CLUTO file formats (cluto/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-cli-cmdclutro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. CLI (cmd/clutro)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-evaluation-evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Evaluation (evaluate/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-validation-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Validation strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-performance-targets-and-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Performance targets and benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-testing-and-quality-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Testing and quality gates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-publication-hygiene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Publication hygiene
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Releases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../releases/v0.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.1.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Architecture overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-module-and-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Module and dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-package-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Package layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-core-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Core types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-algorithms-v01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Algorithms (v0.1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Algorithms (v0.1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-k-means-and-spherical-k-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 k-means and spherical k-means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-repeated-bisection-rb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Repeated bisection (rb)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-refinement-rbr-and-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Refinement (rbr, and direct)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-criterion-i2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Criterion I2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-parallelism-and-determinism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Parallelism and determinism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-explanation-explain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Explanation (explain/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cluto-file-formats-cluto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CLUTO file formats (cluto/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-cli-cmdclutro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. CLI (cmd/clutro)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-evaluation-evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Evaluation (evaluate/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-validation-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Validation strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-performance-targets-and-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Performance targets and benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-testing-and-quality-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Testing and quality gates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-publication-hygiene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Publication hygiene
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="clutro-technical-requirements-document-trd">CLUTRO — Technical Requirements Document (TRD)<a class="headerlink" href="#clutro-technical-requirements-document-trd" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Draft
+<strong>Date:</strong> 2026-10-14
+<strong>Repo:</strong> github.com/grokify/clutro</p>
+<h2 id="1-architecture-overview">1. Architecture overview<a class="headerlink" href="#1-architecture-overview" title="Permanent link">&para;</a></h2>
+<p>A small, layered, dependency-free library. Every algorithm is written against two interfaces — a row-readable matrix and a criterion — so adding a criterion, a metric, or a matrix type never touches the algorithms.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                 clutro (facade: Fit, Options, Result)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                               │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   ┌───────────┬───────────────┼────────────────┬──────────────┐
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   │ partition │  hierarchical │   explain      │   evaluate   │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   │ kmeans    │  (v0.2)       │ describe/      │ ARI NMI      │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   │ skmeans   │  agglo        │ discriminate/  │ purity       │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>   │ bisect    │               │ representatives│ silhouette … │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   │ direct    │               │                │              │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   └─────┬─────┴───────┬───────┴───────┬────────┴──────┬───────┘
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>         │             │               │               │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>   ┌─────▼─────────────▼───────────────▼───────────────▼───────┐
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   │ criterion   I2 (v0.1) · I1 E1 G1 G1′ H1 H2 (v0.2)          │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>   │ metric      Cosine · Euclidean · (Jaccard, Pearson later)  │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>   │ matrix      CSR · Dense · Rows interface · composite vecs  │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>   │ internal/rng  PCG, per-trial streams, deterministic reduce │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>   └────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>         ▲                                   ▲
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>   cluto/ (file formats: .mat .clabel .rlabel .clustering)
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>   cmd/clutro (CLI: vcluster, evaluate, describe)   examples/   bench/
+</code></pre></div>
+<p>Design rules:</p>
+<ul>
+<li><strong>Library packages import only the standard library.</strong> <code>cobra</code> is permitted in <code>cmd/clutro</code> only. No cgo anywhere.</li>
+<li><strong>Algorithms never allocate per row in the inner loop.</strong> Work buffers are sized once per call; sparse dot products are merge-joins over sorted column indices.</li>
+<li><strong>Determinism is a tested contract</strong>, not an accident: every random choice derives from the caller's seed through named sub-streams, and every parallel reduction is order-independent or re-sorted before use.</li>
+<li><strong><code>context.Context</code> on every exported operation that iterates</strong>; cancellation is checked once per outer iteration and returns <code>ctx.Err()</code> wrapped with progress information.</li>
+<li><strong>Errors are returned, never logged.</strong> Invariant violations (NaN in a normalized row, k &gt; rows) are returned as typed errors from validation before any work starts; internal impossibilities panic.</li>
+</ul>
+<h2 id="2-module-and-dependencies">2. Module and dependencies<a class="headerlink" href="#2-module-and-dependencies" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Module:</strong> <code>github.com/grokify/clutro</code>, Go 1.26+</li>
+<li><strong>Library dependencies:</strong> none</li>
+<li><strong>CLI:</strong> <code>github.com/spf13/cobra</code></li>
+<li><strong>Dev/CI:</strong> <code>golangci-lint</code>, <code>gocoverbadge</code>; Python + scikit-learn only inside <code>bench/reference/</code> for cross-validation scripts, never imported by Go code</li>
+<li>Verify versions at adoption time (<code>go list -m -versions</code>); do not assume versions in this document are current.</li>
+</ul>
+<h2 id="3-package-layout">3. Package layout<a class="headerlink" href="#3-package-layout" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>clutro/
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>├── clutro.go              # Fit, Algorithm enum, Result accessors
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├── options.go             # functional options (clusters, similarity, criterion, seed, trials, refinement, selection, parallelism)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>├── result.go              # Result, Tree, per-cluster stats
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>├── errors.go              # typed errors
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>├── matrix/                # Rows interface, CSR, Dense, builders, L2 normalize, composite vector, dot products
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>├── metric/                # Similarity interface, Cosine, Euclidean (as similarity 1/(1+d) and as distance)
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>├── criterion/             # Criterion interface, I2; v0.2: I1 E1 G1 G1′ H1 H2
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>├── partition/             # KMeans (k-means++), SphericalKMeans, Bisect (rb), Refine (rbr), Direct
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>├── hierarchical/          # v0.2: agglomerative over Rows with criterion-driven merging, dendrogram
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>├── explain/               # Describe, Discriminate, Representatives, Summaries
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>├── evaluate/              # ARI, NMI, purity, entropy, silhouette, Davies–Bouldin, Calinski–Harabasz
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>├── cluto/                 # CLUTO file formats: ReadMatrix (sparse/dense), ReadLabels, Read/WriteClustering
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>├── internal/rng/          # PCG64 wrapper, SubStream(seed, name) derivation, deterministic shuffles
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>├── internal/par/          # bounded worker pool with ordered reduction
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>├── cmd/clutro/            # Cobra CLI
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>├── examples/              # compiled-in-CI examples (sparse text, dense embeddings, tree cut, CLUTO migration)
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>├── bench/                 # Go benchmarks + reference scripts + generated datasets (gitignored outputs)
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>├── testdata/              # small synthetic fixtures; CLUTO format samples
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>└── docs/specs/
+</code></pre></div>
+<h2 id="4-core-types">4. Core types<a class="headerlink" href="#4-core-types" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// matrix</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Rows</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nx">NumRows</span><span class="p">()</span><span class="w"> </span><span class="kt">int</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nx">NumCols</span><span class="p">()</span><span class="w"> </span><span class="kt">int</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nx">Row</span><span class="p">(</span><span class="nx">i</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="nx">SparseVec</span><span class="w">          </span><span class="c1">// for Dense: a view with Idx = 0..n-1 (no allocation beyond the view)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nx">RowNorm</span><span class="p">(</span><span class="nx">i</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="kt">float32</span><span class="w">        </span><span class="c1">// cached L2 norm</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">type</span><span class="w"> </span><span class="nx">SparseVec</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Idx</span><span class="w"> </span><span class="p">[]</span><span class="kt">uint32</span><span class="p">;</span><span class="w"> </span><span class="nx">Val</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// Idx sorted ascending</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="kd">type</span><span class="w"> </span><span class="nx">CSR</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">rowPtr</span><span class="w"> </span><span class="p">[]</span><span class="kt">uint32</span><span class="p">;</span><span class="w"> </span><span class="nx">idx</span><span class="w"> </span><span class="p">[]</span><span class="kt">uint32</span><span class="p">;</span><span class="w"> </span><span class="nx">val</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">;</span><span class="w"> </span><span class="nx">norms</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">;</span><span class="w"> </span><span class="nx">nCols</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Dense</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="p">;</span><span class="w"> </span><span class="nx">nCols</span><span class="w"> </span><span class="kt">int</span><span class="p">;</span><span class="w"> </span><span class="nx">norms</span><span class="w"> </span><span class="p">[]</span><span class="kt">float32</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1">// composite vector of a cluster: D_k = Σ rows ∈ S_k, kept dense (len = NumCols) for speed; sparse fallback when NumCols is huge</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Composite</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Sum</span><span class="w"> </span><span class="p">[]</span><span class="kt">float64</span><span class="p">;</span><span class="w"> </span><span class="nx">N</span><span class="w"> </span><span class="kt">int</span><span class="p">;</span><span class="w"> </span><span class="nx">Norm</span><span class="w"> </span><span class="kt">float64</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="c1">// metric</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Similarity</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="nx">Sim</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="nx">SparseVec</span><span class="p">,</span><span class="w"> </span><span class="nx">normA</span><span class="p">,</span><span class="w"> </span><span class="nx">normB</span><span class="w"> </span><span class="kt">float32</span><span class="p">)</span><span class="w"> </span><span class="kt">float64</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="nx">RowToComposite</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="nx">SparseVec</span><span class="p">,</span><span class="w"> </span><span class="nx">normR</span><span class="w"> </span><span class="kt">float32</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Composite</span><span class="p">)</span><span class="w"> </span><span class="kt">float64</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="nx">Name</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="p">}</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="c1">// criterion</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Criterion</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="nx">Name</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="nx">Value</span><span class="p">(</span><span class="nx">comps</span><span class="w"> </span><span class="p">[]</span><span class="nx">Composite</span><span class="p">)</span><span class="w"> </span><span class="kt">float64</span><span class="w">                 </span><span class="c1">// global objective</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="nx">Maximize</span><span class="p">()</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="nx">Delta</span><span class="p">(</span><span class="nx">from</span><span class="p">,</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="o">*</span><span class="nx">Composite</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="nx">SparseVec</span><span class="p">,</span><span class="w"> </span><span class="nx">normR</span><span class="w"> </span><span class="kt">float32</span><span class="p">)</span><span class="w"> </span><span class="kt">float64</span><span class="w"> </span><span class="c1">// change if r moves from→to; must be O(nnz(r))</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="p">}</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="c1">// partition</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Assignment</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Labels</span><span class="w"> </span><span class="p">[]</span><span class="kt">int32</span><span class="p">;</span><span class="w"> </span><span class="nx">K</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Tree</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Root</span><span class="w"> </span><span class="o">*</span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="kd">type</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Rows</span><span class="w"> </span><span class="p">[]</span><span class="kt">int32</span><span class="p">;</span><span class="w"> </span><span class="nx">Left</span><span class="p">,</span><span class="w"> </span><span class="nx">Right</span><span class="w"> </span><span class="o">*</span><span class="nx">Node</span><span class="p">;</span><span class="w"> </span><span class="nx">Criterion</span><span class="w"> </span><span class="kt">float64</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="c1">// facade</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Result</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* Assignment, Composites, Tree (optional), Options, stats */</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="kd">func</span><span class="w"> </span><span class="nx">Fit</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">m</span><span class="w"> </span><span class="nx">matrix</span><span class="p">.</span><span class="nx">Rows</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="p">...</span><span class="nx">Option</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Result</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>The <code>Rows</code> interface is deliberately narrow so a caller with a custom store (e.g. memory-mapped vectors) can implement it.</p>
+<h2 id="5-algorithms-v01">5. Algorithms (v0.1)<a class="headerlink" href="#5-algorithms-v01" title="Permanent link">&para;</a></h2>
+<h3 id="51-k-means-and-spherical-k-means">5.1 k-means and spherical k-means<a class="headerlink" href="#51-k-means-and-spherical-k-means" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Init: k-means++ with <code>trials</code> candidate sets; each trial has its own RNG sub-stream <code>rng.SubStream(seed, "kmeans++", trial)</code>.</li>
+<li>Lloyd iterations until no label changes or <code>maxIter</code> (default 20, matching CLUTO's <code>-niter</code>). Spherical variant normalizes centroids and uses cosine.</li>
+<li>Tie-breaking: lowest cluster index wins; rows are visited in index order; parallel assignment writes to a per-row slot so order never affects results.</li>
+</ul>
+<h3 id="52-repeated-bisection-rb">5.2 Repeated bisection (<code>rb</code>)<a class="headerlink" href="#52-repeated-bisection-rb" title="Permanent link">&para;</a></h3>
+<p>CLUTO's default and the method of record for text:</p>
+<ol>
+<li>Start with all rows in one cluster.</li>
+<li>Repeat k−1 times: choose the cluster to split by <strong>selection policy</strong> — <code>largest</code> (most rows) or <code>best</code> (the split that most improves the criterion; computed lazily and cached per cluster, invalidated on split). Default <code>best</code>, as CLUTO.</li>
+<li>Bisect it with 2-way spherical k-means from <code>trials</code> seeded starts (default 10, CLUTO <code>-ntrials</code>), each run to convergence; keep the bisection with the best criterion value. Clusters with &lt; 2 rows are not split.</li>
+<li>Record both children in the <code>Tree</code>.</li>
+</ol>
+<p>The result is both a flat k-way assignment and a binary tree whose leaves are the k clusters; <code>Tree.CutMaxSize(n)</code> and <code>Tree.CutK(k')</code> re-partition without re-clustering.</p>
+<h3 id="53-refinement-rbr-and-direct">5.3 Refinement (<code>rbr</code>, and <code>direct</code>)<a class="headerlink" href="#53-refinement-rbr-and-direct" title="Permanent link">&para;</a></h3>
+<p>Given an assignment, repeat until no improvement or <code>maxIter</code>: visit rows in a seeded random order; for each row compute <code>criterion.Delta</code> to every other cluster (O(k · nnz(r)) with composite vectors kept dense); move if the best delta &gt; 0 and apply the move immediately (incremental composite update). <code>rbr</code> = <code>rb</code> then refine the final k-way partition (CLUTO also refines at each bisection level when <code>-rbr</code>; v0.1 refines at the end, the per-level variant is an option). <code>direct</code> = k-means++ initial k-way split then refine.</p>
+<h3 id="54-criterion-i2">5.4 Criterion I2<a class="headerlink" href="#54-criterion-i2" title="Permanent link">&para;</a></h3>
+<p>For cosine on L2-normalized rows, cluster k's composite <code>D_k = Σ_{i∈S_k} d_i</code>, and</p>
+<ul>
+<li><code>I2 = Σ_k ‖D_k‖</code> (maximize).</li>
+<li><code>Delta(from, to, r) = (‖D_to + r‖ − ‖D_to‖) + (‖D_from − r‖ − ‖D_from‖)</code>, computed from the stored norms and two sparse dot products: <code>‖D ± r‖² = ‖D‖² ± 2 D·r + ‖r‖²</code>.</li>
+</ul>
+<p>v0.2 criteria (same interface, same delta discipline; definitions per Zhao &amp; Karypis, <em>Machine Learning</em> 55, 2004):</p>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Objective</th>
+<th>Sense</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I1</td>
+<td>Σ_k (1/n_k) ‖D_k‖²</td>
+<td>max</td>
+</tr>
+<tr>
+<td>I2</td>
+<td>Σ_k ‖D_k‖</td>
+<td>max</td>
+</tr>
+<tr>
+<td>E1</td>
+<td>Σ_k n_k · (D_kᵀD)/‖D_k‖</td>
+<td>min</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>Σ_k (D_kᵀ D)/‖D_k‖² (cut / internal)</td>
+<td>min</td>
+</tr>
+<tr>
+<td>G1′</td>
+<td>Σ_k n_k² · (D_kᵀ D)/‖D_k‖²</td>
+<td>min</td>
+</tr>
+<tr>
+<td>H1</td>
+<td>I1 / E1</td>
+<td>max</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>I2 / E1</td>
+<td>max</td>
+</tr>
+</tbody>
+</table>
+<p>where <code>D</code> is the composite of all rows.</p>
+<h3 id="55-parallelism-and-determinism">5.5 Parallelism and determinism<a class="headerlink" href="#55-parallelism-and-determinism" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The distance/similarity sweep of each iteration is split across a bounded pool (<code>WithParallelism(n)</code>, default <code>runtime.NumCPU()</code>); each worker writes results for its row range into pre-allocated slices, so the merge is positional and order-free.</li>
+<li>Any reduction that sums floats across workers sums per-worker partials in worker-index order (fixed), never in completion order.</li>
+<li>Trials run sequentially by default (their RNG streams are independent, so running them in parallel is a pure optimization and must produce the same winner; a test asserts this).</li>
+<li>RNG: PCG64 (<code>math/rand/v2</code> <code>PCG</code>), sub-streams derived by hashing <code>(seed, name, index)</code>.</li>
+</ul>
+<h3 id="56-explanation-explain">5.6 Explanation (<code>explain/</code>)<a class="headerlink" href="#56-explanation-explain" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Descriptive features</strong> of cluster k: columns j ranked by their contribution to the within-cluster similarity, <code>D_k[j]² / ‖D_k‖²</code>; report the top-n and the cumulative share (CLUTO prints enough features to reach a percentage).</li>
+<li><strong>Discriminating features</strong>: columns ranked by <code>D_k[j]·(D[j] − D_k[j])</code> contribution to the between-cluster similarity, i.e. what most separates k from the rest.</li>
+<li><strong>Representatives</strong>: rows with highest <code>RowToComposite</code> similarity to their cluster's composite.</li>
+<li><strong>Summaries</strong>: per cluster, size, mean internal similarity (ISim), mean external similarity (ESim), and their standard deviations.</li>
+</ul>
+<p>Feature names come from an optional <code>[]string</code> column-label slice (CLUTO <code>.clabel</code>) supplied via <code>WithColumnLabels</code>; otherwise indices are reported.</p>
+<h2 id="6-cluto-file-formats-cluto">6. CLUTO file formats (<code>cluto/</code>)<a class="headerlink" href="#6-cluto-file-formats-cluto" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sparse matrix:</strong> header <code>nrows ncols nnz</code>, then one row per line of <code>col val</code> pairs with <strong>1-based</strong> columns. Dense: <code>nrows ncols</code> then values.</li>
+<li><strong>Labels:</strong> <code>.clabel</code> (one column name per line), <code>.rlabel</code> (row names), <code>.rclass</code> (true class per row, for evaluation).</li>
+<li><strong>Clustering:</strong> <code>&lt;matrix&gt;.clustering.&lt;k&gt;</code>, one 0-based cluster id per row, <code>-1</code> for unassigned.</li>
+<li>Readers are streaming and validate shape; writers are deterministic.</li>
+</ul>
+<h2 id="7-cli-cmdclutro">7. CLI (<code>cmd/clutro</code>)<a class="headerlink" href="#7-cli-cmdclutro" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>clutro vcluster [flags] &lt;matrix&gt; &lt;k&gt;
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  -clmethod rb|rbr|direct|kmeans|skmeans   (default rb)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  -crfun    i2|i1|e1|g1|g1p|h1|h2         (default i2; non-i2 from v0.2)
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  -sim      cos|euclid                     (default cos)
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  -cstype   best|largest                   (default best)
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  -ntrials N  -niter N  -seed N  -parallel N
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  -rowmodel none|l2      -colmodel none|idf  (preprocessing, CLUTO vocabulary)
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  -showfeatures [-nfeatures N]  -showsummaries  -showtree
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  -clustfile PATH  -fulltree PATH  -json
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>clutro evaluate [-truth FILE | -rclass] &lt;matrix&gt; &lt;clustering&gt;
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>clutro describe [-nfeatures N] &lt;matrix&gt; &lt;clustering&gt;
+</code></pre></div>
+<p>Flag names deliberately mirror CLUTO's so that scripts port by substitution; <code>-json</code> emits the full <code>Result</code> for programmatic use.</p>
+<h2 id="8-evaluation-evaluate">8. Evaluation (<code>evaluate/</code>)<a class="headerlink" href="#8-evaluation-evaluate" title="Permanent link">&para;</a></h2>
+<p>External (need truth labels): adjusted Rand index, normalized mutual information, purity, entropy (CLUTO's two). Internal: silhouette (sampled above 10k rows, sample seeded), Davies–Bouldin, Calinski–Harabasz. All pure functions over <code>[]int32</code> labels and <code>Rows</code>.</p>
+<h2 id="9-validation-strategy">9. Validation strategy<a class="headerlink" href="#9-validation-strategy" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Reference oracle in-tree.</strong> <code>partition/reference</code> holds slow, obviously-correct implementations of k-means, bisection, and refinement (no parallelism, no incremental deltas, dense composites). The optimized paths must reproduce the reference's labels exactly on every fixture; tie-breaking rules are defined by the reference and documented. (Pattern borrowed from <code>kinn-gg/hdbscan</code>'s <code>Reference</code> vs <code>Exact</code> split.)</li>
+<li><strong>Hand-computable fixtures</strong> (≤ 12 rows): I2 values, deltas, and the exact bisection result are asserted numerically.</li>
+<li><strong>Planted-structure corpora</strong> (<code>testdata/gen</code>): synthetic sparse matrices with known clusters; ARI ≥ 0.95 asserted for <code>rb</code>/<code>rbr</code>/<code>direct</code>.</li>
+<li><strong>CLUTO golden set:</strong> CLUTO's own inputs and outputs for real corpora — the sparse matrix <code>vcluster</code> read and the <code>.clustering.&lt;k&gt;</code> it wrote. The published subset in <code>testdata/cluto/</code> is <strong>numeric only</strong>: no <code>.clabel</code>/<code>.rlabel</code>, corpora renamed <code>corpus-NN</code>, chosen to span sizes (three of ~100–300 rows, three of ~500–1,500, two of ~3,000–6,500 rows with up to ~100k nonzeros) with their original <code>k</code>, under 2 MB total, listed in <code>SHA256SUMS.json</code>. Because CLUTO's RNG stream cannot be reproduced, agreement is measured with ARI (and per-row label agreement after Hungarian matching), reported per corpus as a table in CI; an accepted lower band is set in Phase 3 after inspection and then asserted. The harness also runs with <code>-colmodel none</code> and <code>idf</code> and reports both, since CLUTO's effective default on these files is established empirically rather than assumed. The full ~100-corpus set stays with its owner, who runs the same harness privately.</li>
+<li><strong>scikit-learn cross-check</strong> as pinned parity fixtures: <code>bench/reference/</code> scripts generate <code>testdata/parity/*.json</code> (named per case: <code>kmeans_fixed_init</code>, <code>skmeans_duplicates_ties</code>, <code>silhouette_sampled</code>, …) from a pinned scikit-learn version recorded in <code>NOTICE</code>, with a <code>SHA256SUMS.json</code>; Go tests consume the JSON and never call Python. k-means and spherical k-means with identical init centers must converge to identical labels; silhouette/DB/CH/ARI/NMI values must match to 1e-6.</li>
+<li><strong>Determinism job:</strong> the whole suite at <code>GOMAXPROCS=1</code> and <code>GOMAXPROCS=8</code>, labels diffed.</li>
+</ol>
+<h2 id="10-performance-targets-and-benchmarks">10. Performance targets and benchmarks<a class="headerlink" href="#10-performance-targets-and-benchmarks" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>Target (v0.1, laptop, 8 cores)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10k rows × 1M nnz, <code>rb</code> k=50</td>
+<td>&lt; 2 s</td>
+</tr>
+<tr>
+<td>100k rows × 10M nnz, <code>rb</code> k=100</td>
+<td>&lt; 60 s</td>
+</tr>
+<tr>
+<td>100k rows × 10M nnz, <code>rbr</code> k=100</td>
+<td>&lt; 120 s</td>
+</tr>
+<tr>
+<td>1M rows × 100M nnz, <code>rb</code> k=500</td>
+<td>completes in &lt; 30 min; memory ≤ 3× CSR size</td>
+</tr>
+<tr>
+<td>Dense 100k × 1536, <code>skmeans</code> k=100</td>
+<td>&lt; 60 s</td>
+</tr>
+</tbody>
+</table>
+<p>Published numbers come from <code>bench/</code> runs recorded in release notes; the table above is the target, not a claim.</p>
+<h2 id="11-testing-and-quality-gates">11. Testing and quality gates<a class="headerlink" href="#11-testing-and-quality-gates" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>go test ./...</code> with race detector; coverage badge; <code>golangci-lint</code> clean; <code>CGO_ENABLED=0</code> cross-build matrix in CI.</li>
+<li><code>examples/</code> compile and run in CI; the README example is <code>examples/sparse/main.go</code> verbatim.</li>
+<li>API stability: pre-v1 may break between minors with a CHANGELOG entry; v1.0 freezes <code>clutro</code>, <code>matrix</code>, <code>metric</code>, <code>criterion</code>, <code>evaluate</code>, <code>cluto</code> public APIs.</li>
+</ul>
+<h2 id="12-publication-hygiene">12. Publication hygiene<a class="headerlink" href="#12-publication-hygiene" title="Permanent link">&para;</a></h2>
+<p>The repo is public from its first push. Commit messages, fixtures, and docs contain no private project data, credentials, or internal paths. The CLUTO golden corpus is referenced by name only until the owner publishes a subset; CI fetches nothing private.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1357 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modern clustering toolkit for Go — repeated bisection, spherical k-means, pluggable criteria, cluster explanation, deterministic results.">
+      
+      
+      
+        <link rel="canonical" href="https://grokify.github.io/clutro/specs/PLAN/">
+      
+      
+        <link rel="prev" href="../TRD/">
+      
+      
+        <link rel="next" href="../ROADMAP/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Plan - CLUTRO</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#clutro-implementation-plan-plan" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CLUTRO" class="md-header__button md-logo" aria-label="CLUTRO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CLUTRO
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plan
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/grokify/clutro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    grokify/clutro
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CLUTRO" class="md-nav__button md-logo" aria-label="CLUTRO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    CLUTRO
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/grokify/clutro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    grokify/clutro
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/explaining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Explaining Clusters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/evaluating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluating Clusterings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/numerics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Numerics and Determinism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cli-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cluto-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLUTO Compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks and Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specifications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TRD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#guiding-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guiding constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-matrix-metric-rng-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Matrix, metric, RNG foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-criterion-i2-k-means-family-repeated-bisection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Criterion I2, k-means family, repeated bisection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-cluto-formats-cli-golden-set-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — CLUTO formats, CLI, golden-set validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-explanation-internal-metrics-v01-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Explanation, internal metrics, v0.1 release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-v02-full-criterion-family-and-refinement-fidelity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — v0.2: full criterion family and refinement fidelity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-and-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks and mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Releases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../releases/v0.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.1.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#guiding-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guiding constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-matrix-metric-rng-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Matrix, metric, RNG foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-criterion-i2-k-means-family-repeated-bisection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Criterion I2, k-means family, repeated bisection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-cluto-formats-cli-golden-set-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — CLUTO formats, CLI, golden-set validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-explanation-internal-metrics-v01-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Explanation, internal metrics, v0.1 release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-v02-full-criterion-family-and-refinement-fidelity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — v0.2: full criterion family and refinement fidelity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-and-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks and mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="clutro-implementation-plan-plan">CLUTRO — Implementation Plan (PLAN)<a class="headerlink" href="#clutro-implementation-plan-plan" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Draft
+<strong>Date:</strong> 2026-10-14
+<strong>Repo:</strong> github.com/grokify/clutro</p>
+<p>This plan sequences the work defined in the <a href="../PRD/">PRD</a> and <a href="../TRD/">TRD</a>. Roadmap items and phase membership are tracked in <a href="../ROADMAP/">ROADMAP.md</a>; this document explains ordering, dependencies, and verification per phase.</p>
+<h2 id="guiding-constraints">Guiding constraints<a class="headerlink" href="#guiding-constraints" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Correct before fast, fast before broad.</strong> Phase 1 proves the sparse primitives and determinism machinery with benchmarks; algorithms are added only on top of measured primitives; new algorithm families wait for v0.2+.</li>
+<li><strong>Every phase leaves <code>main</code> building with <code>CGO_ENABLED=0</code>, tested with <code>-race</code>, lint-clean, and with the README example compiling.</strong></li>
+<li><strong>Library packages stay dependency-free.</strong> A <code>go.mod</code> diff that adds a library dependency is a design review, not a routine change.</li>
+<li><strong>Determinism is enforced from Phase 1</strong>, so later algorithms inherit it instead of retrofitting it.</li>
+<li><strong>Public from the first commit:</strong> generic technical commit messages, synthetic fixtures only, no private data or paths.</li>
+<li><strong>Verify dependency versions</strong> (<code>cobra</code>) at adoption time.</li>
+</ul>
+<h2 id="phase-1-matrix-metric-rng-foundation">Phase 1 — Matrix, metric, RNG foundation<a class="headerlink" href="#phase-1-matrix-metric-rng-foundation" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> <code>matrix.CSR</code> / <code>matrix.Dense</code> behind <code>Rows</code>, cosine and Euclidean similarity, composite vectors with incremental update, deterministic RNG sub-streams and a bounded pool with ordered reduction — all benchmarked.</p>
+<p>Order of work:</p>
+<ol>
+<li>Module scaffold: <code>go.mod</code>, <code>LICENSE</code> (Apache-2.0), README, CI workflows (test with <code>-race</code>, lint, <code>CGO_ENABLED=0</code> cross-build matrix, determinism job stub), <code>CHANGELOG.json</code>.</li>
+<li><code>matrix/</code>: <code>SparseVec</code>, <code>Rows</code>, <code>CSR</code> (from triplets, from row slices), <code>Dense</code>, <code>NormalizeRowsL2</code>, cached norms, sparse·sparse and sparse·dense dot products (merge-join), <code>Composite</code> with <code>Add</code>/<code>Remove</code> and norm maintenance. Benchmarks for dot products at 100/1k/10k nnz.</li>
+<li><code>metric/</code>: <code>Similarity</code> interface; <code>Cosine</code> (dot on normalized rows, with a slow path for unnormalized), <code>Euclidean</code> as distance and as similarity.</li>
+<li><code>internal/rng/</code>: PCG64 sub-streams <code>SubStream(seed, name, idx)</code>, seeded shuffle; <code>internal/par/</code>: bounded pool, positional writes, worker-order reduction.</li>
+<li><code>testdata/gen</code>: planted-structure generator (sparse and dense) used by every later phase.</li>
+</ol>
+<p><strong>Verify:</strong> benchmarks recorded in <code>bench/README.md</code>; float32-storage/float64-accumulation decision confirmed by a precision test on 1M-nnz composites (PRD §9.2); <code>go test -race</code> clean.</p>
+<h2 id="phase-2-criterion-i2-k-means-family-repeated-bisection">Phase 2 — Criterion I2, k-means family, repeated bisection<a class="headerlink" href="#phase-2-criterion-i2-k-means-family-repeated-bisection" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> <code>clutro.Fit</code> with <code>KMeans</code>, <code>SphericalKMeans</code>, <code>RepeatedBisection</code> (+<code>WithRefinement</code>), <code>Direct</code>, optimizing I2, returning a <code>Result</code> with a <code>Tree</code>.</p>
+<p>Order of work:</p>
+<ol>
+<li><code>criterion/</code>: interface, <code>I2</code> with <code>Value</code> and <code>Delta</code> (TRD §5.4), numeric tests against hand-computed fixtures.</li>
+<li><code>partition/kmeans.go</code>: k-means++ init with trials, Lloyd, spherical variant; parallel assignment via <code>internal/par</code>.</li>
+<li><code>partition/bisect.go</code>: 2-way bisection with trials; selection policies <code>best</code> and <code>largest</code>; <code>Tree</code> construction; <code>CutMaxSize</code>, <code>CutK</code>.</li>
+<li><code>partition/refine.go</code>: incremental refinement using <code>Criterion.Delta</code>; <code>Direct</code> = k-way init + refine.</li>
+<li><code>clutro.go</code>, <code>options.go</code>, <code>result.go</code>, <code>errors.go</code>: facade, validation, option defaults mirroring CLUTO (<code>rb</code>, <code>i2</code>, <code>cos</code>, <code>best</code>, 10 trials, 20 iterations).</li>
+<li>Density interop example (<code>examples/hdbscan</code>): adapt <code>matrix.Dense</code> to <code>kinn-gg/hdbscan</code>'s <code>Dense64</code>, and build a kNN cosine similarity graph from CSR rows and convert it to its <code>SparsePrecomputed</code> distance graph. Lives under <code>examples/</code> with its own <code>go.mod</code> so the library keeps zero dependencies.</li>
+</ol>
+<p><strong>Depends on:</strong> Phase 1. <strong>Verify:</strong> planted-structure ARI ≥ 0.95 for all algorithms; determinism job passes (<code>GOMAXPROCS</code> 1 vs 8, sequential vs parallel trials); TRD §10 10k-row target met; README example compiles from <code>examples/sparse</code>.</p>
+<h2 id="phase-3-cluto-formats-cli-golden-set-validation">Phase 3 — CLUTO formats, CLI, golden-set validation<a class="headerlink" href="#phase-3-cluto-formats-cli-golden-set-validation" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> <code>clutro vcluster</code> is a drop-in for CLUTO's <code>vcluster</code> on the supported flags, and agreement with CLUTO's own results is measured.</p>
+<p>Order of work:</p>
+<ol>
+<li><code>cluto/</code>: readers/writers for sparse/dense matrices (1-based columns), <code>.clabel</code>, <code>.rlabel</code>, <code>.rclass</code>, <code>.clustering.&lt;k&gt;</code>; round-trip tests; malformed-input tests.</li>
+<li><code>evaluate/</code> external metrics: ARI, NMI, purity, entropy.</li>
+<li><code>cmd/clutro</code>: <code>vcluster</code> with the TRD §7 flags, <code>-json</code>; <code>evaluate</code>; exit codes and stderr progress.</li>
+<li>Golden-set harness (<code>bench/golden</code>): run every CLUTO corpus in a directory (the public <code>testdata/cluto/</code> subset in CI; the owner's full set privately), compute ARI and matched label agreement vs CLUTO's <code>.clustering.&lt;k&gt;</code> under <code>-colmodel none</code> and <code>idf</code>, print a table; inspect the worst corpora by hand; set and assert the lower band. The published subset is numeric-only and renamed (TRD §9.3).</li>
+<li>Row/column preprocessing flags (<code>-rowmodel l2</code>, <code>-colmodel idf</code>) so raw count matrices can be clustered like CLUTO does.</li>
+</ol>
+<p><strong>Depends on:</strong> Phase 2. <strong>Verify:</strong> a CLUTO script with the binary name swapped produces a <code>.clustering.&lt;k&gt;</code> file with ARI in the accepted band; <code>clutro evaluate</code> matches scikit-learn's ARI/NMI on fixtures to 1e-9.</p>
+<h2 id="phase-4-explanation-internal-metrics-v01-release">Phase 4 — Explanation, internal metrics, v0.1 release<a class="headerlink" href="#phase-4-explanation-internal-metrics-v01-release" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> Every cluster can be explained and every run can be scored without truth labels; v0.1.0 tagged.</p>
+<p>Order of work:</p>
+<ol>
+<li><code>explain/</code>: descriptive and discriminating features with cumulative share, representatives, summaries (ISim/ESim); column labels via option; <code>-showfeatures</code>, <code>-showsummaries</code>, <code>describe</code> command.</li>
+<li><code>evaluate/</code> internal metrics: silhouette (seeded sampling above 10k rows), Davies–Bouldin, Calinski–Harabasz; scikit-learn cross-check script in <code>bench/reference/</code>.</li>
+<li><code>examples/</code>: sparse text with explanation, dense embeddings, tree cut, CLUTO migration — all compiled in CI.</li>
+<li>Documentation: algorithm reference with citations and the "differences from CLUTO" page; benchmarks page from <code>bench/</code> runs on the 10k/100k workloads.</li>
+<li>Release: CHANGELOG, coverage badge, <code>v0.1.0</code> after CI passes; the first consumer switches from a local <code>replace</code> to the tagged version.</li>
+</ol>
+<p><strong>Depends on:</strong> Phases 2–3. <strong>Verify:</strong> PRD §8 v0.1 rows; a cluster of a real text corpus reads sensibly from its top-5 descriptive features in manual review.</p>
+<h2 id="phase-5-v02-full-criterion-family-and-refinement-fidelity">Phase 5 — v0.2: full criterion family and refinement fidelity<a class="headerlink" href="#phase-5-v02-full-criterion-family-and-refinement-fidelity" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> CLUTO's optimization vocabulary is complete: I1, E1, G1, G1′, H1, H2 with incremental deltas; per-level refinement in <code>rbr</code>; agglomerative clustering driven by the same criteria.</p>
+<p>Order of work:</p>
+<ol>
+<li><code>criterion/</code>: I1, E1, G1, G1′ with <code>Delta</code>; H1, H2 as ratios with delta via numerator/denominator tracking; numeric tests per criterion; <code>-crfun</code> wired.</li>
+<li><code>rbr</code> per-level refinement option (refine after every bisection, as CLUTO does); comparison against end-only refinement on the golden set.</li>
+<li><code>hierarchical/</code>: agglomerative merging that maximizes the chosen criterion (CLUTO <code>agglo</code>), dendrogram output, <code>CutK</code>; <code>-fulltree</code> building the hierarchy on top of <code>rb</code> leaves.</li>
+<li>Jaccard and Pearson similarities; <code>-sim</code> extended.</li>
+<li>Benchmarks and golden-set re-run per criterion; <code>v0.2.0</code>.</li>
+</ol>
+<p><strong>Depends on:</strong> Phase 4. <strong>Decision point:</strong> whether graph-input clustering (<code>scluster</code>) is next (v0.3) depends on demand from consumers; density methods are only scheduled if a concrete user needs them.</p>
+<h2 id="risks-and-mitigations">Risks and mitigations<a class="headerlink" href="#risks-and-mitigations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Float32 precision degrades I2 deltas on huge composites</td>
+<td>Accumulate in float64; precision test in Phase 1 before committing to storage width</td>
+</tr>
+<tr>
+<td>Parallel code silently breaks determinism</td>
+<td>Dedicated CI job diffs labels across <code>GOMAXPROCS</code>; no completion-order reductions by construction</td>
+</tr>
+<tr>
+<td>Golden-set agreement with CLUTO is low for legitimate reasons (different RNG, tie-breaks)</td>
+<td>Measure with ARI, not exact match; inspect worst cases; document differences rather than chase bit-parity</td>
+</tr>
+<tr>
+<td>Scope creep toward a framework</td>
+<td>PRD non-goals; any new algorithm family requires a consumer and a roadmap phase</td>
+</tr>
+<tr>
+<td>Name confusion with CLUTO</td>
+<td>README and release notes carry the non-affiliation statement; no CLUTO code or binaries ever enter the repo</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

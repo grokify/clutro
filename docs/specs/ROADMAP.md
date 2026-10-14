@@ -30,11 +30,11 @@ Phase status is always derived from member RMI statuses, never set directly. Rev
 ## Phase 3 — CLUTO Formats, CLI & Golden-Set Validation
 **Theme:** Drop-in migration for CLUTO users and a measured answer to "how close to CLUTO is it?"
 
-- [ ] `RMI-CLUTRO-011` cluto/: readers and writers for sparse/dense matrices, .clabel/.rlabel/.rclass, .clustering.<k>; round-trip and malformed-input tests
+- [x] `RMI-CLUTRO-011` cluto/: readers and writers for sparse/dense matrices, .clabel/.rlabel/.rclass, .clustering.<k>; round-trip and malformed-input tests
 - [x] `RMI-CLUTRO-012` evaluate/ external metrics: adjusted Rand index, NMI, purity, entropy (pulled into Phase 2 as the partition tests' measure)
-- [ ] `RMI-CLUTRO-013` cmd/clutro: `vcluster` with CLUTO flag vocabulary and `-json`, `evaluate`; progress and exit codes
-- [ ] `RMI-CLUTRO-014` Golden-set harness: per-corpus ARI and matched-label table against CLUTO outputs under `none`/`idf` column models, manual inspection of outliers, accepted band asserted; numeric-only renamed fixture subset in testdata/cluto with SHA256SUMS
-- [ ] `RMI-CLUTRO-015` Preprocessing: `-rowmodel l2` and `-colmodel idf` so raw count matrices cluster as CLUTO does
+- [x] `RMI-CLUTRO-013` cmd/clutro: `vcluster` with CLUTO flag vocabulary and `-json`, `evaluate`, `golden`; standard-library flags so `-flag=value` and `--flag value` both work; zero dependencies
+- [x] `RMI-CLUTRO-014` Golden-set harness: per-corpus ARI/NMI/I2 table against CLUTO outputs under `none`/`idf` column models; band set from a 103-corpus run (mean ARI ≥ 0.25, min ≥ 0.05, I2 ratio ≥ 0.99) and asserted on the numeric-only renamed fixture subset in testdata/cluto with SHA256SUMS
+- [x] `RMI-CLUTRO-015` Preprocessing: `-rowmodel l2` and `-colmodel idf` so raw count matrices cluster as CLUTO does
 
 ## Phase 4 — Explanation, Internal Metrics & v0.1.0
 **Theme:** Clusters that explain themselves and runs that can be scored without truth labels; the first tagged release with a production consumer.

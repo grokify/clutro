@@ -14,7 +14,12 @@
       { "description": "`partition`: `KMeans` (greedy k-means++ seeding, Lloyd, spherical under cosine), `Bisect` repeated bisection with `SelectBest`/`SelectLargest` and a bisection `Tree` with `CutMaxSize`/`CutK`, `Refine` (criterion-driven single-row moves) and `Direct`; all deterministic for a seed and independent of worker count" },
       { "description": "`clutro.Fit` facade with functional options (algorithm, clusters, similarity, criterion, refinement, seed, trials, iterations, selection, parallelism, row/column labels) returning a `Result` with labels, sizes, clusters, composites and the bisection tree" },
       { "description": "`partition/reference` slow oracle implementations that the optimized paths are tested against, and a Determinism CI job running the suite under several GOMAXPROCS values" },
-      { "description": "`evaluate`: adjusted Rand index, normalized mutual information, purity and entropy" }
+      { "description": "`evaluate`: adjusted Rand index, normalized mutual information, purity and entropy" },
+      { "description": "`cluto`: readers and writers for CLUTO sparse and dense matrices, label files and clustering files" },
+      { "description": "`matrix.Preprocess` with `RowL2` and `ColIDF` (CLUTO `-rowmodel`/`-colmodel`)" },
+      { "description": "`golden`: a harness that re-clusters CLUTO corpora and reports ARI, NMI and both partitions' I2; published numeric-only fixtures in `testdata/cluto` with an asserted agreement band" },
+      { "description": "`clutro` CLI (`vcluster`, `evaluate`, `golden`) with CLUTO's flag vocabulary, standard-library flag parsing and no dependencies" },
+      { "description": "`examples/hdbscan`: feeding CLUTRO matrices to kinn-gg/hdbscan as a dense matrix or a connected kNN cosine distance graph" }
     ]
   },
   "releases": []

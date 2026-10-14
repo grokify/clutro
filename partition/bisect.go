@@ -118,7 +118,7 @@ func cachedSplit(ctx context.Context, m matrix.Rows, f *Node, o Options, cache m
 	// another split's random choices.
 	stream := "bisect"
 	o2 := o
-	o2.Seed = o.Seed ^ uint64(*idx)*0x9E3779B97F4A7C15
+	o2.Seed = o.Seed ^ uint64(*idx)*0x9E3779B97F4A7C15 //nolint:gosec // idx counts splits; the product is a hash, wrap-around is intended
 	*idx++
 	a, err := kmeansSubset(ctx, m, f.Rows, 2, o2, stream)
 	if err != nil {

@@ -15,8 +15,9 @@ func SubStream(seed uint64, name string, idx int) *rand.Rand {
 	h := fnv.New64a()
 	_, _ = h.Write([]byte(name)) // fnv never returns an error
 	var b [8]byte
+	u := uint64(idx) //nolint:gosec // idx is hashed, not interpreted; any bit pattern is fine
 	for i := 0; i < 8; i++ {
-		b[i] = byte(uint64(idx) >> (8 * i))
+		b[i] = byte(u >> (8 * i)) //nolint:gosec // serializing the 8 bytes of u
 	}
 	_, _ = h.Write(b[:])
 	return rand.New(rand.NewPCG(seed, h.Sum64())) //nolint:gosec // deterministic streams are the point

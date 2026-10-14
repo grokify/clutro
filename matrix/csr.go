@@ -47,7 +47,7 @@ func NewCSRFromRows(nCols int, rows []SparseVec) (*CSR, error) {
 	for i, r := range rows {
 		m.idx = append(m.idx, r.Idx...)
 		m.val = append(m.val, r.Val...)
-		m.rowPtr[i+1] = uint32(len(m.idx))
+		m.rowPtr[i+1] = uint32(len(m.idx)) //nolint:gosec // nnz <= MaxUint32 checked above
 		m.norms[i] = float32(r.Norm())
 	}
 	return m, nil
@@ -82,7 +82,7 @@ func NewCSRFromTriplets(nRows, nCols int, ts []Triplet) (*CSR, error) {
 		}
 		if sum != 0 {
 			r := &rows[sorted[i].Row]
-			r.Idx = append(r.Idx, uint32(sorted[i].Col))
+			r.Idx = append(r.Idx, uint32(sorted[i].Col)) //nolint:gosec // 0 <= Col < nCols, checked above
 			r.Val = append(r.Val, float32(sum))
 		}
 		i = j

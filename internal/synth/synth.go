@@ -33,7 +33,7 @@ func Sparse(p Params) (*matrix.CSR, []int32) {
 	}
 	labels := make([]int32, p.Rows)
 	for i := range labels {
-		labels[i] = int32(i % p.K)
+		labels[i] = int32(i % p.K) //nolint:gosec // bounded by K
 	}
 	r.Shuffle(len(labels), func(i, j int) { labels[i], labels[j] = labels[j], labels[i] })
 
@@ -50,7 +50,7 @@ func Sparse(p Params) (*matrix.CSR, []int32) {
 			if c >= p.Cols {
 				c = p.Cols - 1
 			}
-			cols[uint32(c)] = float32(1 + r.IntN(3))
+			cols[uint32(c)] = float32(1 + r.IntN(3)) //nolint:gosec // 0 <= c < Cols
 		}
 		rows[i] = fromMap(cols)
 	}
@@ -77,7 +77,7 @@ func Dense(rows, dims, k int, spread float64, seed uint64) (*matrix.Dense, []int
 	data := make([]float32, 0, rows*dims)
 	for i := 0; i < rows; i++ {
 		c := i % k
-		labels[i] = int32(c)
+		labels[i] = int32(c) //nolint:gosec // bounded by k
 		for d := 0; d < dims; d++ {
 			data = append(data, float32(centers[c][d]+r.NormFloat64()*spread))
 		}

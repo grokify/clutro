@@ -10,12 +10,6 @@ linters:
     - unconvert
     - unparam
     - whitespace
-  settings:
-    gosec:
-      excludes:
-        # G115 (int -> uint32/int32 conversions): column indices and labels
-        # are deliberately 32-bit; constructors check ranges once.
-        - G115
   exclusions:
     generated: lax
     presets:
@@ -23,7 +17,25 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+    rules:
+      - linters:
+          - dupl
+        path: _test\.go
+  settings:
+    staticcheck:
+      checks:
+        - "-QF1008" # Disable the "could remove embedded field" check
 formatters:
   enable:
     - gofmt
     - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -1,0 +1,20 @@
+{
+  "files": {
+    "corpus-01.mat": "63666361a983f8920e46df8af29a78f524048b55b75358744f95a7c9753ea49e",
+    "corpus-01.mat.clustering.2": "79b9cf77f5e53d4a29a550399503d03a704bcc93abc64ebd3c59aa2106188fd1",
+    "corpus-02.mat": "018d000588340042d092dc909806c25c3385ae357970b601064cd178a813390f",
+    "corpus-02.mat.clustering.6": "5cfd4477e0d1fa49ed550ca64ea9fe8e207fa2dc88c1e44a6f2509abb09d4088",
+    "corpus-03.mat": "4ce7c2c9411bd0f2947090f6aa4de4ffdce90fc0aa139979f2d613df7efe67b3",
+    "corpus-03.mat.clustering.10": "c1c5267fe61b03b8674753105b00162a6745f4dbc920f3782ec021fc81cce804",
+    "corpus-04.mat": "32fd96524039be4ad9ef61e05f16be8ea3c4c029fc22348b2c2581629ef5a596",
+    "corpus-04.mat.clustering.13": "89919a5d8c9771e923725cd76e3063c859ad8a9413efd8a430ef46218235914b",
+    "corpus-05.mat": "6144d8a0a435475b3b2fa0d6f5b2e3e7b12129eaf9c3ee1c3613d4b4fb39b203",
+    "corpus-05.mat.clustering.17": "a49e74e0f8e30c04a11d1a25653b942ca5467d3b350010ee83bc0cd776db2a29",
+    "corpus-06.mat": "1ff6c2ce50d146280eb6ef4e6a96ede063ab0098334c64592e341e0bd660722e",
+    "corpus-06.mat.clustering.31": "3e1c8b16d9efbed5b7ccfa516dc30d655e61aaeea069a2f84f32a9749135f77f",
+    "corpus-07.mat": "ae83b64534f5404dd952a8574fa601127cacb2f5a7a79058c11039120860e7a5",
+    "corpus-07.mat.clustering.71": "960c99d7029542fd68a62be6eedc343ce1551d5dde1c141cece8dc20d4dd16ce",
+    "corpus-08.mat": "bc376e93d2226a575b77678f001c16b68510a0423a0f95d45f97c3df3258da78",
+    "corpus-08.mat.clustering.535": "da1128b81d15932d0e6ec26d15e37fc0a9923ac0a058ac7f65c721c31c77878a"
+  }
+}

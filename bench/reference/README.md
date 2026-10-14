@@ -13,7 +13,7 @@ values were first derived:
 
 - two pairs `(0,0),(0,1)` and `(10,10),(10,11)`: within-pair distance 1,
   cross distances √200 and √221;
-- silhouette = (b − a)/b with a = 1, b = (√200 + √221)/2 → 0.93104;
+- silhouette: a = 1 for every point; the outer points see b = (√200 + √221)/2 and the inner points b = (√181 + √200)/2, so the mean is 0.92929;
 - Davies–Bouldin = (0.5 + 0.5)/√200 → 0.070711;
 - Calinski–Harabasz = (200/1)/(1/2) → 400.
 

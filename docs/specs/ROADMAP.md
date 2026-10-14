@@ -11,11 +11,11 @@ Phase status is always derived from member RMI statuses, never set directly. Rev
 ## Phase 1 — Matrix, Metric & RNG Foundation
 **Theme:** Dependency-free sparse/dense primitives, similarity metrics, and the determinism machinery every algorithm will inherit — all benchmarked before any algorithm exists.
 
-- [ ] `RMI-CLUTRO-001` Module scaffold: go.mod, Apache-2.0 LICENSE, README with non-affiliation statement, CI (race tests, lint, CGO_ENABLED=0 cross-build, determinism job), CHANGELOG.json
-- [ ] `RMI-CLUTRO-002` matrix/: SparseVec, Rows interface, CSR and Dense, L2 normalization with cached norms, merge-join dot products, Composite with incremental add/remove; benchmarks
-- [ ] `RMI-CLUTRO-003` metric/: Similarity interface, Cosine (normalized fast path), Euclidean as distance and similarity
-- [ ] `RMI-CLUTRO-004` internal/rng (PCG64 sub-streams, seeded shuffle) and internal/par (bounded pool, positional writes, worker-order reduction)
-- [ ] `RMI-CLUTRO-005` testdata/gen planted-structure generator (sparse and dense) and the float32-storage precision test
+- [x] `RMI-CLUTRO-001` Module scaffold: go.mod, Apache-2.0 LICENSE, README with non-affiliation statement, CI (race tests, lint, CGO_ENABLED=0 cross-build), CHANGELOG.json — the determinism job lands with the first algorithm in Phase 2
+- [x] `RMI-CLUTRO-002` matrix/: SparseVec, Rows interface, CSR and Dense, L2 normalization with cached norms, merge-join dot products, Composite with incremental add/remove; benchmarks
+- [x] `RMI-CLUTRO-003` metric/: Similarity interface, Cosine (normalized fast path), Euclidean as distance and similarity
+- [x] `RMI-CLUTRO-004` internal/rng (PCG64 sub-streams, seeded shuffle) and internal/par (bounded pool, positional writes, worker-order reduction)
+- [x] `RMI-CLUTRO-005` internal/synth planted-structure generator (sparse and dense) and the float32-storage precision test
 
 ## Phase 2 — Criterion I2, k-means Family & Repeated Bisection
 **Theme:** The CLUTO core — I2 with incremental deltas, k-means++/spherical k-means, repeated bisection with trials and selection policies, refinement — behind one `Fit` facade returning labels and a bisection tree.

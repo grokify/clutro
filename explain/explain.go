@@ -113,10 +113,14 @@ func Discriminate(m matrix.Rows, labels []int32, k, c, n int, colLabels []string
 	if total == 0 {
 		return nil
 	}
-	for i := range feats {
-		feats[i].Weight /= total
+	kept := feats[:0]
+	for _, f := range feats {
+		f.Weight /= total
+		if f.Weight >= 1e-9 { // drop rounding noise from features present on both sides
+			kept = append(kept, f)
+		}
 	}
-	return topN(feats, n)
+	return topN(kept, n)
 }
 
 // Representatives returns the n rows of cluster c most similar to its

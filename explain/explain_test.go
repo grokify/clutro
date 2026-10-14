@@ -38,7 +38,9 @@ func TestDescribeAndDiscriminate(t *testing.T) {
 	for _, f := range Describe(m, labels, 2, 0, -1, cols) {
 		total += f.Weight
 	}
-	if math.Abs(total-1) > 1e-9 {
+	// The composite norm is maintained incrementally from float32 row norms,
+	// so the shares sum to 1 within single precision.
+	if math.Abs(total-1) > 1e-6 {
 		t.Fatalf("descriptive weights sum to %v", total)
 	}
 	// "the" describes cluster 0 (it is present) but does not discriminate it.

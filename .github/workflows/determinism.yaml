@@ -1,0 +1,38 @@
+name: Determinism
+# Runs the whole suite under different scheduler conditions. Every test that
+# fits a model compares its labels against a reference computed with other
+# worker counts, so a scheduling-dependent result anywhere fails here.
+permissions:
+  contents: read
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/determinism.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/determinism.yaml'
+  workflow_dispatch:
+
+jobs:
+  determinism:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gomaxprocs: [1, 2, 8]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test with GOMAXPROCS=${{ matrix.gomaxprocs }}
+        env:
+          GOMAXPROCS: ${{ matrix.gomaxprocs }}
+        run: go test -count=1 -race ./...

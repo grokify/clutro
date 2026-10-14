@@ -5,22 +5,31 @@
   "versioning": "semver",
   "commitConvention": "conventional",
   "maintainers": ["grokify"],
-  "unreleased": {
-    "added": [
-      { "description": "`matrix`: `SparseVec`, the `Rows` interface, `CSR` (from rows or triplets, L2 row normalization, column scaling, document frequencies) and `Dense` with cached row norms, merge-join dot products, and `Composite` cluster vectors with incremental add/remove and what-if norms" },
-      { "description": "`metric`: `Similarity` interface with `Cosine` (normalized fast path) and `Euclidean` (as distance and as similarity, centroid-based against composites)" },
-      { "description": "Deterministic foundations: seeded named RNG sub-streams and a chunked worker pool with worker-order reductions, plus a planted-structure corpus generator for tests and benchmarks" },
-      { "description": "`criterion`: the `Criterion` interface and `I2` (Σ‖D_k‖) with an O(nnz) single-row move delta" },
-      { "description": "`partition`: `KMeans` (greedy k-means++ seeding, Lloyd, spherical under cosine), `Bisect` repeated bisection with `SelectBest`/`SelectLargest` and a bisection `Tree` with `CutMaxSize`/`CutK`, `Refine` (criterion-driven single-row moves) and `Direct`; all deterministic for a seed and independent of worker count" },
-      { "description": "`clutro.Fit` facade with functional options (algorithm, clusters, similarity, criterion, refinement, seed, trials, iterations, selection, parallelism, row/column labels) returning a `Result` with labels, sizes, clusters, composites and the bisection tree" },
-      { "description": "`partition/reference` slow oracle implementations that the optimized paths are tested against, and a Determinism CI job running the suite under several GOMAXPROCS values" },
-      { "description": "`evaluate`: adjusted Rand index, normalized mutual information, purity and entropy" },
-      { "description": "`cluto`: readers and writers for CLUTO sparse and dense matrices, label files and clustering files" },
-      { "description": "`matrix.Preprocess` with `RowL2` and `ColIDF` (CLUTO `-rowmodel`/`-colmodel`)" },
-      { "description": "`golden`: a harness that re-clusters CLUTO corpora and reports ARI, NMI and both partitions' I2; published numeric-only fixtures in `testdata/cluto` with an asserted agreement band" },
-      { "description": "`clutro` CLI (`vcluster`, `evaluate`, `golden`) with CLUTO's flag vocabulary, standard-library flag parsing and no dependencies" },
-      { "description": "`examples/hdbscan`: feeding CLUTRO matrices to kinn-gg/hdbscan as a dense matrix or a connected kNN cosine distance graph" }
-    ]
-  },
-  "releases": []
+  "unreleased": {},
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-10-14",
+      "commit": "09b2b3c",
+      "highlights": [
+        { "description": "A pure-Go, zero-dependency clustering toolkit in the CLUTO tradition: sparse and dense matrices, the I2 criterion, repeated bisection with refinement, spherical k-means, cluster explanation, external and internal evaluation metrics, CLUTO file formats and a `vcluster`-compatible CLI, all deterministic for a seed regardless of `GOMAXPROCS`.", "commit": "4d0f588" },
+        { "description": "Validated against CLUTO's own outputs on 103 real text corpora: CLUTRO's partitions score 1.0007× (`rb`) to 1.033× (`rbr`) of CLUTO's on the criterion CLUTO optimized; eight numeric-only corpora are published as fixtures with an asserted agreement band.", "commit": "a985ea4" }
+      ],
+      "added": [
+        { "description": "`matrix`: `SparseVec`, the `Rows` interface, `CSR` (from rows or triplets, L2 row normalization, column scaling, document frequencies) and `Dense` with cached row norms, merge-join dot products, and `Composite` cluster vectors with incremental add/remove and what-if norms", "commit": "01f42d6" },
+        { "description": "`matrix.Preprocess` with `RowL2` and `ColIDF` (CLUTO `-rowmodel`/`-colmodel`)", "commit": "6829e27" },
+        { "description": "`metric`: `Similarity` interface with `Cosine` (normalized fast path) and `Euclidean` (as distance and as similarity, centroid-based against composites)", "commit": "c9cf40f" },
+        { "description": "`criterion`: the `Criterion` interface and `I2` (Σ‖D_k‖) with an O(nnz) single-row move delta", "commit": "84f32e6" },
+        { "description": "`partition`: `KMeans` (greedy k-means++ seeding, Lloyd, spherical under cosine), `Bisect` repeated bisection with `SelectBest`/`SelectLargest` and a bisection `Tree` with `CutMaxSize`/`CutK`, `Refine` (criterion-driven single-row moves) and `Direct`; deterministic empty-cluster reseeding", "commit": "836b62d" },
+        { "description": "`clutro.Fit` facade with functional options (algorithm, clusters, similarity, criterion, refinement, seed, trials, iterations, selection, parallelism, row/column labels) returning a `Result` with labels, sizes, clusters, composites and the bisection tree", "commit": "4d0f588" },
+        { "description": "`explain`: descriptive and discriminating features, representatives and ISim/ESim summaries, exposed as `Result.Describe`, `Discriminate`, `Representatives`, `Summaries`", "commit": "4247a3b" },
+        { "description": "`evaluate`: adjusted Rand index, normalized mutual information, purity, entropy, silhouette (seeded sampling above 10,000 rows), Davies–Bouldin and Calinski–Harabasz, cross-checked against scikit-learn", "commit": "3b72ae2" },
+        { "description": "`cluto`: readers and writers for CLUTO sparse and dense matrices, label files and clustering files", "commit": "3ae4669" },
+        { "description": "`golden`: a harness that re-clusters CLUTO corpora and reports ARI, NMI and both partitions' I2; published numeric-only fixtures in `testdata/cluto` with an asserted agreement band", "commit": "21be9cb" },
+        { "description": "`clutro` CLI (`vcluster`, `evaluate`, `golden`) with CLUTO's flag vocabulary and standard-library flag parsing", "commit": "5c07167" },
+        { "description": "Deterministic foundations: seeded named RNG sub-streams, a chunked worker pool with worker-order reductions, slow reference implementations the optimized paths are tested against, and a Determinism CI job across `GOMAXPROCS` values", "commit": "e924afb" },
+        { "description": "Examples: sparse text with explanations, dense embeddings with internal metrics, choosing k from the bisection tree, the CLUTO file workflow, and density clustering via kinn-gg/hdbscan in a separate module", "commit": "09b2b3c" }
+      ]
+    }
+  ]
 }

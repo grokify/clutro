@@ -6,42 +6,43 @@ CLUTRO is inspired by CLUTO. It is an independent clean-room implementation of t
 
 ## Status
 
-Pre-release. The design is specified in [`docs/specs/`](docs/specs/) (PRD, TRD, PLAN, ROADMAP); implementation follows the roadmap phases. Nothing below should be read as a performance or compatibility claim until the corresponding roadmap item is checked off.
+Pre-release, under active development toward v0.1.0. Implemented so far: sparse/dense matrices, cosine and Euclidean similarity, the I2 criterion, k-means, repeated bisection with refinement, direct k-way clustering, the `Fit` facade, and external evaluation metrics. Still to come for v0.1.0: CLUTO file formats, the CLI, cluster explanation, internal metrics. The design is specified in [`docs/specs/`](docs/specs/) (PRD, TRD, PLAN, ROADMAP). Nothing below should be read as a performance or compatibility claim until the corresponding roadmap item is checked off.
 
 ## Why
 
 Go has several dense k-means ports and no clustering engine that handles the shape of real text and embedding workloads: tens of thousands to millions of **sparse** rows, cosine similarity, a criterion function to optimize rather than a distance to minimize, and an answer to "why are these together?" CLUTRO fills that gap and stays an engine — embedding generation, vector stores, LLM calls, and visualization remain the caller's business.
 
-## Intended API (v0.1 target)
+## Usage
 
 ```go
 import (
     "github.com/grokify/clutro"
-    "github.com/grokify/clutro/criterion"
     "github.com/grokify/clutro/matrix"
-    "github.com/grokify/clutro/metric"
 )
 
-m := matrix.NewCSR(rows, cols, nnz) // or matrix.NewDense(rows, cols)
-// ... fill ...
+m, err := matrix.NewCSRFromTriplets(nRows, nCols, triplets) // or matrix.NewDense(nRows, nCols, values)
+if err != nil {
+    return err
+}
+m.NormalizeRowsL2()
 
 res, err := clutro.Fit(ctx, m,
-    clutro.WithAlgorithm(clutro.RepeatedBisection),
+    clutro.WithAlgorithm(clutro.RepeatedBisection), // rb; Direct and KMeans also available
     clutro.WithClusters(12),
-    clutro.WithSimilarity(metric.Cosine),
-    clutro.WithCriterion(criterion.I2),
     clutro.WithRefinement(true), // CLUTO "rbr"
     clutro.WithSeed(42),
 )
 if err != nil {
     return err
 }
-for k, members := range res.Clusters() {
-    fmt.Println(k, len(members), res.Describe(k, 5)) // descriptive features
+for k, rows := range res.Clusters() {
+    fmt.Println(k, len(rows))
 }
+tree := res.Tree()            // bisection hierarchy (RepeatedBisection only)
+_ = tree.CutMaxSize(12)       // re-partition to ≈12 rows per leaf without re-clustering
 ```
 
-Same input, same seed, same version ⇒ same labels, regardless of `GOMAXPROCS`.
+Defaults match CLUTO's: cosine similarity, the I2 criterion, 10 seeded trials, `best` cluster selection. Same input, same seed, same version ⇒ same labels, regardless of `GOMAXPROCS` — the optimized paths are tested against slow reference implementations and a CI job runs the suite under several `GOMAXPROCS` values. Cluster explanation (`Describe`) and CLUTO file formats are the next roadmap items.
 
 ## CLI
 

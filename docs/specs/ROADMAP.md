@@ -20,18 +20,18 @@ Phase status is always derived from member RMI statuses, never set directly. Rev
 ## Phase 2 — Criterion I2, k-means Family & Repeated Bisection
 **Theme:** The CLUTO core — I2 with incremental deltas, k-means++/spherical k-means, repeated bisection with trials and selection policies, refinement — behind one `Fit` facade returning labels and a bisection tree.
 
-- [ ] `RMI-CLUTRO-006` criterion/: Criterion interface and I2 (Value, Delta) with hand-computed numeric tests
-- [ ] `RMI-CLUTRO-007` partition/kmeans: k-means++ init with seeded trials, Lloyd, spherical variant, parallel assignment
-- [ ] `RMI-CLUTRO-008` partition/bisect: 2-way bisection with trials, `best`/`largest` selection, Tree with CutMaxSize and CutK
-- [ ] `RMI-CLUTRO-009` partition/refine: incremental criterion-driven refinement (`rbr`) and Direct (k-way init + refine)
-- [ ] `RMI-CLUTRO-010` clutro facade: Fit, Options with CLUTO-matching defaults, Result, typed errors; `partition/reference` oracle implementations; determinism CI job asserting identical labels across GOMAXPROCS, trial scheduling, and against the reference
+- [x] `RMI-CLUTRO-006` criterion/: Criterion interface and I2 (Value, Delta) with hand-computed numeric tests
+- [x] `RMI-CLUTRO-007` partition/kmeans: greedy k-means++ init with seeded trials, Lloyd, spherical variant, parallel assignment, deterministic empty-cluster reseeding
+- [x] `RMI-CLUTRO-008` partition/bisect: 2-way bisection with trials, `best`/`largest` selection, Tree with CutMaxSize and CutK
+- [x] `RMI-CLUTRO-009` partition/refine: incremental criterion-driven refinement (`rbr`) and Direct (k-way init + refine)
+- [x] `RMI-CLUTRO-010` clutro facade: Fit, Options with CLUTO-matching defaults, Result, typed errors; `partition/reference` oracle implementations; determinism CI job asserting identical labels across GOMAXPROCS, trial scheduling, and against the reference
 - [ ] `RMI-CLUTRO-026` Density interop: `matrix.Dense` → `kinn-gg/hdbscan` `Dense64` adapter and a kNN cosine similarity graph → `SparsePrecomputed` distance graph, as a compiled example (no library dependency on hdbscan)
 
 ## Phase 3 — CLUTO Formats, CLI & Golden-Set Validation
 **Theme:** Drop-in migration for CLUTO users and a measured answer to "how close to CLUTO is it?"
 
 - [ ] `RMI-CLUTRO-011` cluto/: readers and writers for sparse/dense matrices, .clabel/.rlabel/.rclass, .clustering.<k>; round-trip and malformed-input tests
-- [ ] `RMI-CLUTRO-012` evaluate/ external metrics: adjusted Rand index, NMI, purity, entropy
+- [x] `RMI-CLUTRO-012` evaluate/ external metrics: adjusted Rand index, NMI, purity, entropy (pulled into Phase 2 as the partition tests' measure)
 - [ ] `RMI-CLUTRO-013` cmd/clutro: `vcluster` with CLUTO flag vocabulary and `-json`, `evaluate`; progress and exit codes
 - [ ] `RMI-CLUTRO-014` Golden-set harness: per-corpus ARI and matched-label table against CLUTO outputs under `none`/`idf` column models, manual inspection of outliers, accepted band asserted; numeric-only renamed fixture subset in testdata/cluto with SHA256SUMS
 - [ ] `RMI-CLUTRO-015` Preprocessing: `-rowmodel l2` and `-colmodel idf` so raw count matrices cluster as CLUTO does

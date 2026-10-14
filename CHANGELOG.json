@@ -9,7 +9,12 @@
     "added": [
       { "description": "`matrix`: `SparseVec`, the `Rows` interface, `CSR` (from rows or triplets, L2 row normalization, column scaling, document frequencies) and `Dense` with cached row norms, merge-join dot products, and `Composite` cluster vectors with incremental add/remove and what-if norms" },
       { "description": "`metric`: `Similarity` interface with `Cosine` (normalized fast path) and `Euclidean` (as distance and as similarity, centroid-based against composites)" },
-      { "description": "Deterministic foundations: seeded named RNG sub-streams and a chunked worker pool with worker-order reductions, plus a planted-structure corpus generator for tests and benchmarks" }
+      { "description": "Deterministic foundations: seeded named RNG sub-streams and a chunked worker pool with worker-order reductions, plus a planted-structure corpus generator for tests and benchmarks" },
+      { "description": "`criterion`: the `Criterion` interface and `I2` (Σ‖D_k‖) with an O(nnz) single-row move delta" },
+      { "description": "`partition`: `KMeans` (greedy k-means++ seeding, Lloyd, spherical under cosine), `Bisect` repeated bisection with `SelectBest`/`SelectLargest` and a bisection `Tree` with `CutMaxSize`/`CutK`, `Refine` (criterion-driven single-row moves) and `Direct`; all deterministic for a seed and independent of worker count" },
+      { "description": "`clutro.Fit` facade with functional options (algorithm, clusters, similarity, criterion, refinement, seed, trials, iterations, selection, parallelism, row/column labels) returning a `Result` with labels, sizes, clusters, composites and the bisection tree" },
+      { "description": "`partition/reference` slow oracle implementations that the optimized paths are tested against, and a Determinism CI job running the suite under several GOMAXPROCS values" },
+      { "description": "`evaluate`: adjusted Rand index, normalized mutual information, purity and entropy" }
     ]
   },
   "releases": []
